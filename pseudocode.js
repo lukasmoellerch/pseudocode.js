@@ -9,7 +9,7 @@ var Renderer = require('./src/Renderer');
 
 module.exports = {
     ParseError: ParseError,
-    renderToString: function(input, options) {
+    renderToString: function (input, options) {
         if (input === null || input === undefined)
             throw 'input cannot be empty';
 
@@ -18,7 +18,7 @@ module.exports = {
         var renderer = new Renderer(parser, options);
         return renderer.toMarkup();
     },
-    render: function(input, baseDomEle, options) {
+    render: function (input, baseDomEle, options) {
         if (input === null || input === undefined)
             throw 'input cannot be empty';
 

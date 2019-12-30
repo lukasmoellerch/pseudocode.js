@@ -1,3 +1,6 @@
+const ParseError = require("./ParseError");
+
+const katex = require("katex");
 /*
 * */
 var utils = require('./utils');
@@ -34,12 +37,12 @@ function TextStyle(outerFontSize) {
  * As we use relative font size 'em', the outer span (has its own TextStyle
  * object) affects the size of the span to which this TextStyle object attached.
  * */
-TextStyle.prototype.outerFontSize = function(size) {
+TextStyle.prototype.outerFontSize = function (size) {
     if (size !== undefined) this._outerFontSize = size;
     return this._outerFontSize;
 };
 
-TextStyle.prototype.fontSize = function() {
+TextStyle.prototype.fontSize = function () {
     return this._fontSize;
 };
 
@@ -49,53 +52,53 @@ TextStyle.prototype.fontSize = function() {
 TextStyle.prototype._fontCommandTable = {
     // -------------- declaration --------------
     // font-family
-    normalfont: { 'font-family': 'KaTeX_Main'},
-    rmfamily: { 'font-family': 'KaTeX_Main'},
-    sffamily: { 'font-family': 'KaTeX_SansSerif'},
-    ttfamily: { 'font-family': 'KaTeX_Typewriter'},
+    normalfont: { 'font-family': 'KaTeX_Main' },
+    rmfamily: { 'font-family': 'KaTeX_Main' },
+    sffamily: { 'font-family': 'KaTeX_SansSerif' },
+    ttfamily: { 'font-family': 'KaTeX_Typewriter' },
     // weight
-    bfseries: { 'font-weight': 'bold'},
-    mdseries: { 'font-weight': 'medium'},
-    lfseries: { 'font-weight': 'lighter'},
+    bfseries: { 'font-weight': 'bold' },
+    mdseries: { 'font-weight': 'medium' },
+    lfseries: { 'font-weight': 'lighter' },
     // shape
-    upshape: { 'font-style': 'normal', 'font-variant': 'normal'},
-    itshape: { 'font-style': 'italic', 'font-variant': 'normal'},
-    scshape: { 'font-style': 'normal', 'font-variant': 'small-caps'},
-    slshape: { 'font-style': 'oblique', 'font-variant': 'normal'},
+    upshape: { 'font-style': 'normal', 'font-variant': 'normal' },
+    itshape: { 'font-style': 'italic', 'font-variant': 'normal' },
+    scshape: { 'font-style': 'normal', 'font-variant': 'small-caps' },
+    slshape: { 'font-style': 'oblique', 'font-variant': 'normal' },
     // -------------- command --------------
     // font-family
-    textnormal: { 'font-family': 'KaTeX_Main'},
-    textrm: { 'font-family': 'KaTeX_Main'},
-    textsf: { 'font-family': 'KaTeX_SansSerif'},
-    texttt: { 'font-family': 'KaTeX_Typewriter'},
+    textnormal: { 'font-family': 'KaTeX_Main' },
+    textrm: { 'font-family': 'KaTeX_Main' },
+    textsf: { 'font-family': 'KaTeX_SansSerif' },
+    texttt: { 'font-family': 'KaTeX_Typewriter' },
     // weight
-    textbf: { 'font-weight': 'bold'},
-    textmd: { 'font-weight': 'medium'},
-    textlf: { 'font-weight': 'lighter'},
+    textbf: { 'font-weight': 'bold' },
+    textmd: { 'font-weight': 'medium' },
+    textlf: { 'font-weight': 'lighter' },
     // shape
-    textup: { 'font-style': 'normal', 'font-variant': 'normal'},
-    textit: { 'font-style': 'italic', 'font-variant': 'normal'},
-    textsc: { 'font-style': 'normal', 'font-variant': 'small-caps'},
-    textsl: { 'font-style': 'oblique', 'font-variant': 'normal'},
+    textup: { 'font-style': 'normal', 'font-variant': 'normal' },
+    textit: { 'font-style': 'italic', 'font-variant': 'normal' },
+    textsc: { 'font-style': 'normal', 'font-variant': 'small-caps' },
+    textsl: { 'font-style': 'oblique', 'font-variant': 'normal' },
     // case
-    uppercase: { 'text-transform': 'uppercase'},
-    lowercase: { 'text-transform': 'lowercase'},
+    uppercase: { 'text-transform': 'uppercase' },
+    lowercase: { 'text-transform': 'lowercase' },
 };
 
 TextStyle.prototype._sizingScalesTable = {
-    tiny:           0.68,
-    scriptsize:     0.80,
-    footnotesize:   0.85,
-    small:          0.92,
-    normalsize:     1.00,
-    large:          1.17,
-    Large:          1.41,
-    LARGE:          1.58,
-    huge:           1.90,
-    Huge:           2.28,
+    tiny: 0.68,
+    scriptsize: 0.80,
+    footnotesize: 0.85,
+    small: 0.92,
+    normalsize: 1.00,
+    large: 1.17,
+    Large: 1.41,
+    LARGE: 1.58,
+    huge: 1.90,
+    Huge: 2.28,
 };
 
-TextStyle.prototype.updateByCommand = function(cmd) {
+TextStyle.prototype.updateByCommand = function (cmd) {
     // Font command
     var cmdStyles = this._fontCommandTable[cmd];
     if (cmdStyles !== undefined) {
@@ -112,10 +115,10 @@ TextStyle.prototype.updateByCommand = function(cmd) {
         return;
     }
 
-    throw new ParserError('unrecogniazed text-style command');
+    throw new ParseError('unrecognized text-style command');
 };
 
-TextStyle.prototype.toCSS = function() {
+TextStyle.prototype.toCSS = function () {
     var cssStr = '';
     for (var attr in this._css) {
         var val = this._css[attr];
@@ -137,15 +140,15 @@ function TextEnvironment(nodes, textStyle) {
     this._textStyle = textStyle;
 }
 
-TextEnvironment.prototype._renderCloseText = function(node) {
+TextEnvironment.prototype._renderCloseText = function (node) {
     var newTextStyle = new TextStyle(this._textStyle.fontSize());
     var closeTextEnv = new TextEnvironment(
-                            node.children, newTextStyle);
+        node.children, newTextStyle);
     if (node.whitespace) this._html.putText(' ');
     this._html.putSpan(closeTextEnv.renderToHTML());
 };
 
-TextEnvironment.prototype.renderToHTML = function() {
+TextEnvironment.prototype.renderToHTML = function () {
     this._html = new HTMLBuilder();
 
     var node;
@@ -161,17 +164,13 @@ TextEnvironment.prototype.renderToHTML = function() {
                 this._html.putText(text);
                 break;
             case 'math':
-                if (!katex) {
-                    try { katex = require('katex'); }
-                    catch (e) { throw 'katex is required to render math'; }
-                }
                 var mathHTML = katex.renderToString(text);
                 this._html.putSpan(mathHTML);
                 break;
             case 'cond-symbol':
                 this._html.beginSpan('ps-keyword')
-                          .putText(text.toLowerCase())
-                          .endSpan();
+                    .putText(text.toLowerCase())
+                    .endSpan();
                 break;
             case 'special':
                 if (text === '\\\\') {
@@ -243,7 +242,7 @@ TextEnvironment.prototype.renderToHTML = function() {
                 this._textStyle.updateByCommand(text);
                 this._html.beginSpan(null, this._textStyle.toCSS());
                 var textEnvForDclr = new TextEnvironment(this._nodes,
-                                        this._textStyle);
+                    this._textStyle);
                 this._html.putSpan(textEnvForDclr.renderToHTML());
                 this._html.endSpan();
                 break;
@@ -255,7 +254,7 @@ TextEnvironment.prototype.renderToHTML = function() {
                 innerTextStyle.updateByCommand(text);
                 this._html.beginSpan(null, innerTextStyle.toCSS());
                 var textEnvForCmd = new TextEnvironment(textNode.children,
-                                        innerTextStyle);
+                    innerTextStyle);
                 this._html.putSpan(textEnvForCmd.renderToHTML());
                 this._html.endSpan();
                 break;
@@ -273,71 +272,71 @@ function HTMLBuilder() {
     this._textBuf = [];
 }
 
-HTMLBuilder.prototype.beginDiv = function(className, style, extraStyle) {
+HTMLBuilder.prototype.beginDiv = function (className, style, extraStyle) {
     this._beginTag('div', className, style, extraStyle);
     this._body.push('\n'); // make the generated HTML more human friendly
     return this;
 };
 
-HTMLBuilder.prototype.endDiv = function() {
+HTMLBuilder.prototype.endDiv = function () {
     this._endTag('div');
     this._body.push('\n'); // make the generated HTML more human friendly
     return this;
 };
 
-HTMLBuilder.prototype.beginP = function(className, style, extraStyle) {
+HTMLBuilder.prototype.beginP = function (className, style, extraStyle) {
     this._beginTag('p', className, style, extraStyle);
     this._body.push('\n'); // make the generated HTML more human friendly
     return this;
 };
 
-HTMLBuilder.prototype.endP = function() {
+HTMLBuilder.prototype.endP = function () {
     this._flushText();
     this._endTag('p');
     this._body.push('\n'); // make the generated HTML more human friendly
     return this;
 };
 
-HTMLBuilder.prototype.beginSpan = function(className, style, extraStyle) {
+HTMLBuilder.prototype.beginSpan = function (className, style, extraStyle) {
     this._flushText();
     return this._beginTag('span', className, style, extraStyle);
 };
 
-HTMLBuilder.prototype.endSpan = function() {
+HTMLBuilder.prototype.endSpan = function () {
     this._flushText();
     return this._endTag('span');
 };
 
 HTMLBuilder.prototype.putHTML =
-HTMLBuilder.prototype.putSpan = function(html) {
-    this._flushText();
-    this._body.push(html);
-    return this;
-};
+    HTMLBuilder.prototype.putSpan = function (html) {
+        this._flushText();
+        this._body.push(html);
+        return this;
+    };
 
-HTMLBuilder.prototype.putText = function(text) {
+HTMLBuilder.prototype.putText = function (text) {
     this._textBuf.push(text);
     return this;
 };
 
-HTMLBuilder.prototype.write = function(html) {
+HTMLBuilder.prototype.write = function (html) {
     this._body.push(html);
 };
 
-HTMLBuilder.prototype.toMarkup = function() {
+HTMLBuilder.prototype.toMarkup = function () {
     this._flushText();
     var html = this._body.join('');
     return html.trim();
 };
 
-HTMLBuilder.prototype.toDOM = function() {
+HTMLBuilder.prototype.toDOM = function () {
     var html = this.toMarkup();
     var div = document.createElement('div');
     div.innerHTML = html;
     return div.firstChild;
 };
 
-HTMLBuilder.prototype._flushText = function() {
+HTMLBuilder.prototype._flushText = function () {
     if (this._textBuf.length === 0) return;
 
     var text = this._textBuf.join('');
@@ -353,7 +352,7 @@ HTMLBuilder.prototype._flushText = function() {
             either a string, e.g., 'color:red', or an object, e.g.
             { color: 'red', margin-left: '1em'}
 */
-HTMLBuilder.prototype._beginTag = function(tag, className, style, extraStyle) {
+HTMLBuilder.prototype._beginTag = function (tag, className, style, extraStyle) {
     var spanHTML = '<' + tag;
     if (className) spanHTML += ' class="' + className + '"';
     if (style) {
@@ -362,7 +361,7 @@ HTMLBuilder.prototype._beginTag = function(tag, className, style, extraStyle) {
         else { // style
             styleCode = '';
             for (var attrName in style) {
-                attrVal = style[attrName];
+                const attrVal = style[attrName];
                 styleCode += attrName + ':' + attrVal + ';';
             }
         }
@@ -374,7 +373,7 @@ HTMLBuilder.prototype._beginTag = function(tag, className, style, extraStyle) {
     return this;
 };
 
-HTMLBuilder.prototype._endTag = function(tag) {
+HTMLBuilder.prototype._endTag = function (tag) {
     this._body.push('</' + tag + '>');
     return this;
 };
@@ -388,8 +387,8 @@ var entityMap = {
     "/": '&#x2F;',
 };
 
-HTMLBuilder.prototype._escapeHtml = function(string) {
-    return String(string).replace(/[&<>"'\/]/g, function(s) {
+HTMLBuilder.prototype._escapeHtml = function (string) {
+    return String(string).replace(/[&<>"'/]/g, function (s) {
         return entityMap[s];
     });
 };
@@ -413,8 +412,8 @@ HTMLBuilder.prototype._escapeHtml = function(string) {
 function RendererOptions(options) {
     options = options || {};
     this.indentSize = options.indentSize ?
-                        this._parseEmVal(options.indentSize) : 1.2;
-    this.commentDelimiter  = options.commentDelimiter  || ' // ';
+        this._parseEmVal(options.indentSize) : 1.2;
+    this.commentDelimiter = options.commentDelimiter || ' // ';
     this.lineNumberPunc = options.lineNumberPunc || ':';
     this.lineNumber = options.lineNumber !== undefined ? options.lineNumber : false;
     this.noEnd = options.noEnd !== undefined ? options.noEnd : false;
@@ -422,7 +421,7 @@ function RendererOptions(options) {
         Renderer.captionCount = options.captionCount;
 }
 
-RendererOptions.prototype._parseEmVal = function(emVal) {
+RendererOptions.prototype._parseEmVal = function (emVal) {
     emVal = emVal.trim();
     if (emVal.indexOf('em') !== emVal.length - 2)
         throw 'option unit error; no `em` found';
@@ -447,32 +446,32 @@ function Renderer(parser, options) {
 /*  The global counter for the numbering of the algorithm environment */
 Renderer.captionCount = 0;
 
-Renderer.prototype.toMarkup = function() {
+Renderer.prototype.toMarkup = function () {
     var html = this._html = new HTMLBuilder();
     this._buildTree(this._root);
     delete this._html;
     return html.toMarkup();
 };
 
-Renderer.prototype.toDOM = function() {
+Renderer.prototype.toDOM = function () {
     var html = this.toMarkup();
     var div = document.createElement('div');
     div.innerHTML = html;
     return div.firstChild;
 };
 
-Renderer.prototype._beginGroup = function(name, extraClass, style) {
+Renderer.prototype._beginGroup = function (name, extraClass, style) {
     this._closeLineIfAny();
     this._html.beginDiv('ps-' + name + (extraClass ? ' ' + extraClass : ''),
-                        style);
+        style);
 };
 
-Renderer.prototype._endGroup = function(name) {
+Renderer.prototype._endGroup = function (name) {
     this._closeLineIfAny();
     this._html.endDiv();
 };
 
-Renderer.prototype._beginBlock = function() {
+Renderer.prototype._beginBlock = function () {
     // The first block have to extra left margin when line number are displayed
     var extraIndentForFirstBlock =
         this._options.lineNumber && this._blockLevel === 0 ? 0.6 : 0;
@@ -484,13 +483,13 @@ Renderer.prototype._beginBlock = function() {
     this._blockLevel++;
 };
 
-Renderer.prototype._endBlock = function() {
+Renderer.prototype._endBlock = function () {
     this._closeLineIfAny();
     this._endGroup();
     this._blockLevel--;
 };
 
-Renderer.prototype._newLine = function() {
+Renderer.prototype._newLine = function () {
     this._closeLineIfAny();
 
     this._openLine = true;
@@ -508,8 +507,8 @@ Renderer.prototype._newLine = function() {
             this._html.beginSpan('ps-linenum', {
                 'left': -((this._blockLevel - 1) * (indentSize * 1.25)) + 'em',
             })
-            .putText(this._numLOC + this._options.lineNumberPunc)
-            .endSpan();
+                .putText(this._numLOC + this._options.lineNumberPunc)
+                .endSpan();
         }
     }
     // if this line is for pre-conditions (e.g. \REQUIRE)
@@ -521,7 +520,7 @@ Renderer.prototype._newLine = function() {
     }
 };
 
-Renderer.prototype._closeLineIfAny = function() {
+Renderer.prototype._closeLineIfAny = function () {
     if (!this._openLine) return;
 
     this._html.endP();
@@ -529,19 +528,19 @@ Renderer.prototype._closeLineIfAny = function() {
     this._openLine = false;
 };
 
-Renderer.prototype._typeKeyword = function(keyword) {
+Renderer.prototype._typeKeyword = function (keyword) {
     this._html.beginSpan('ps-keyword').putText(keyword).endSpan();
 };
 
-Renderer.prototype._typeFuncName = function(funcName) {
+Renderer.prototype._typeFuncName = function (funcName) {
     this._html.beginSpan('ps-funcname').putText(funcName).endSpan();
 };
 
-Renderer.prototype._typeText = function(text) {
+Renderer.prototype._typeText = function (text) {
     this._html.write(text);
 };
 
-Renderer.prototype._buildTreeForAllChildren = function(node) {
+Renderer.prototype._buildTreeForAllChildren = function (node) {
     var children = node.children;
     for (var ci = 0; ci < children.length; ci++)
         this._buildTree(children[ci]);
@@ -549,7 +548,7 @@ Renderer.prototype._buildTreeForAllChildren = function(node) {
 
 // The comment nodes at the beginning of blockNode are comments for controls
 // Thus they should be rendered out of block
-Renderer.prototype._buildCommentsFromBlock = function(blockNode) {
+Renderer.prototype._buildCommentsFromBlock = function (blockNode) {
     var children = blockNode.children;
     while (children.length > 0 && children[0].type === 'comment') {
         var commentNode = children.shift();
@@ -557,7 +556,7 @@ Renderer.prototype._buildCommentsFromBlock = function(blockNode) {
     }
 };
 
-Renderer.prototype._buildTree = function(node) {
+Renderer.prototype._buildTree = function (node) {
     var ci; var child; var textNode;
     switch (node.type) {
         // The hierarchicy of build tree: Group (Block) > Line > Text
@@ -647,7 +646,7 @@ Renderer.prototype._buildTree = function(node) {
             // </p>
             this._newLine();
             this._typeKeyword('if ');
-            ifCond = node.children[0];
+            var ifCond = node.children[0];
             this._buildTree(ifCond);
             this._typeKeyword(' then');
             // <block>
@@ -657,7 +656,7 @@ Renderer.prototype._buildTree = function(node) {
 
             // ( \ELIF {<cond>} <block> )[0..n]
             var numElif = node.value.numElif;
-            for (var ei = 0 ; ei < numElif; ei++) {
+            for (var ei = 0; ei < numElif; ei++) {
                 // \ELIF {<cond>}
                 // ==>
                 // <p class="ps-line">
@@ -762,6 +761,32 @@ Renderer.prototype._buildTree = function(node) {
                 this._buildTree(repeatCond);
             }
             break;
+        case 'dowhile':
+            // \REPEAT
+            // ==>
+            // <p class="ps-line">
+            //     <span class="ps-keyword">repeat</span>
+            // </p>
+            this._newLine();
+            this._typeKeyword('do');
+
+            // block
+            var dowhileBlock = node.children[0];
+            this._buildCommentsFromBlock(dowhileBlock);
+            this._buildTree(dowhileBlock);
+
+            if (!this._options.noEnd) {
+                // \UNTIL{<cond>}
+                // ==>
+                // <p class="ps-line">
+                //     <span class="ps-keyword">until</span>
+                // </p>
+                this._newLine();
+                this._typeKeyword('while ');
+                var dowhileCond = node.children[1];
+                this._buildTree(dowhileCond);
+            }
+            break;
         // ------------------- Lines -------------------
         case 'command':
             // commands: \STATE, \ENSURE, \PRINT, \RETURN, etc.
@@ -797,7 +822,7 @@ Renderer.prototype._buildTree = function(node) {
         // ------------------- Text -------------------
         case 'open-text':
             var openTextEnv = new TextEnvironment(node.children,
-                                    this._globalTextStyle);
+                this._globalTextStyle);
             this._html.putSpan(openTextEnv.renderToHTML());
             break;
         case 'close-text':

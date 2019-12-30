@@ -5,7 +5,7 @@
 var utils = require('./utils');
 var ParseError = require('./ParseError');
 
-var Lexer = function(input) {
+var Lexer = function (input) {
     this._input = input;
     this._remain = input;
     this._pos = 0;
@@ -13,7 +13,7 @@ var Lexer = function(input) {
     this._next(); // get the next atom
 };
 
-Lexer.prototype.accept = function(type, text) {
+Lexer.prototype.accept = function (type, text) {
     if (this._nextAtom.type === type && this._matchText(text)) {
         this._next();
         return this._currentAtom.text;
@@ -21,7 +21,7 @@ Lexer.prototype.accept = function(type, text) {
     return null;
 };
 
-Lexer.prototype.expect = function(type, text) {
+Lexer.prototype.expect = function (type, text) {
     var nextAtom = this._nextAtom;
     // The next atom is NOT of the right type
     if (nextAtom.type !== type)
@@ -36,7 +36,7 @@ Lexer.prototype.expect = function(type, text) {
     return this._currentAtom.text;
 };
 
-Lexer.prototype.get = function() {
+Lexer.prototype.get = function () {
     return this._currentAtom;
 };
 
@@ -45,10 +45,10 @@ Lexer.prototype.get = function() {
     expression. This object simulates a RegEx object
 */
 var mathPattern = {
-    exec: function(str) {
+    exec: function (str) {
         var delimiters = [
-            {start: '$', end: '$'},
-            {start: '\\(', end: '\\)'},
+            { start: '$', end: '$' },
+            { start: '\\(', end: '\\)' },
         ];
         var totalLen = str.length;
 
@@ -73,8 +73,10 @@ var mathPattern = {
                     continue;
                 }
 
-                var res = [str.slice(0, endPos + pos + endDel.length),
-                    str.slice(startDel.length, endPos + pos)];
+                var res = [
+                    str.slice(0, endPos + pos + endDel.length),
+                    str.slice(startDel.length, endPos + pos),
+                ];
                 return res;
             }
         }
@@ -95,15 +97,15 @@ var atomRegex = {
 var commentRegex = /^%.*/;
 var whitespaceRegex = /^\s+/;
 
-Lexer.prototype._skip = function(len) {
+Lexer.prototype._skip = function (len) {
     this._pos += len;
     this._remain = this._remain.slice(len);
 };
 
 /* Get the next atom */
-Lexer.prototype._next = function() {
+Lexer.prototype._next = function () {
     var anyWhitespace = false;
-    while (1) {
+    while (true) {
         // Skip whitespace (one or more)
         var whitespaceMatch = whitespaceRegex.exec(this._remain);
         if (whitespaceMatch) {
@@ -159,7 +161,7 @@ Lexer.prototype._next = function() {
 };
 
 /* Check whether the text of the next atom matches */
-Lexer.prototype._matchText = function(text) {
+Lexer.prototype._matchText = function (text) {
     // don't need to match
     if (text === null || text === undefined) return true;
 
@@ -167,7 +169,7 @@ Lexer.prototype._matchText = function(text) {
     if (utils.isString(text)) // is a string, exactly the same?
         return text.toLowerCase() === this._nextAtom.text.toLowerCase();
     else {// is a list, match any of them?
-        text = text.map(function(str) { return str.toLowerCase(); });
+        text = text.map(function (str) { return str.toLowerCase(); });
         return text.indexOf(this._nextAtom.text.toLowerCase()) >= 0;
     }
 };
